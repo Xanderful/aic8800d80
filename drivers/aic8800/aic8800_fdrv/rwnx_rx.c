@@ -1663,6 +1663,8 @@ void reord_timeout_handler (struct timer_list *t)
 {
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4,14,0)
 	struct reord_ctrl *preorder_ctrl = (struct reord_ctrl *)data;
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
+	struct reord_ctrl *preorder_ctrl = timer_container_of(preorder_ctrl, t, reord_timer);
 #else
 	struct reord_ctrl *preorder_ctrl = from_timer(preorder_ctrl, t, reord_timer);
 #endif
@@ -2073,7 +2075,11 @@ check_len_update:
         hdr = (struct ieee80211_hdr *)(skb->data + msdu_offset);
         rwnx_vif = rwnx_rx_get_vif(rwnx_hw, hw_rxhdr->flags_vif_idx);
         if (rwnx_vif) {
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
+            cfg80211_rx_spurious_frame(rwnx_vif->ndev, hdr->addr2, -1, GFP_ATOMIC);
+#else
             cfg80211_rx_spurious_frame(rwnx_vif->ndev, hdr->addr2, GFP_ATOMIC);
+#endif
         }
         goto end;
     }
@@ -2168,8 +2174,13 @@ check_len_update:
                 }
 
                 if (hw_rxhdr->flags_is_4addr && !rwnx_vif->use_4addr) {
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
+                    cfg80211_rx_unexpected_4addr_frame(rwnx_vif->ndev,
+                                                       sta->mac_addr, -1, GFP_ATOMIC);
+#else
                     cfg80211_rx_unexpected_4addr_frame(rwnx_vif->ndev,
                                                        sta->mac_addr, GFP_ATOMIC);
+#endif
                 }
             }
 

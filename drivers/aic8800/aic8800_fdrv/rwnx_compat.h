@@ -428,4 +428,11 @@ enum {
 typedef __s64 time64_t;
 #endif
 
+/* In kernel 6.16+, del_timer/del_timer_sync were removed.
+ * Use timer_delete/timer_delete_sync instead. */
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
+#define del_timer(t)        timer_delete(t)
+#define del_timer_sync(t)   timer_delete_sync(t)
+#endif
+
 #endif /* _RWNX_COMPAT_H_ */

@@ -61,7 +61,7 @@ MAKEFLAGS +=-j$(shell nproc)
 
 all: modules
 modules:
-	make -C $(KDIR) M=$(PWD) ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) modules
+	make -C $(KDIR) M=$(PWD) ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) KCFLAGS="-w" modules
 
 install:
 	mkdir -p $(MODDESTDIR)

@@ -1,2 +1,7 @@
-KERNEL=="sd*", ATTRS{idVendor}=="a69c", ATTRS{idProduct}=="5721",  SYMLINK+="aicudisk", RUN+="/usr/bin/eject /dev/%k"
-KERNEL=="sd*", ATTRS{idVendor}=="a69c", ATTRS{idProduct}=="5723",  SYMLINK+="tendaudisk", RUN+="/usr/bin/eject /dev/%k"
+# Auto-eject mass storage mode to switch to WiFi
+KERNEL=="sd*", ATTRS{idVendor}=="a69c", ATTRS{idProduct}=="5721",  SYMLINK+="aicudisk", ENV{UDISKS_IGNORE}="1", RUN+="/usr/bin/eject /dev/%k"
+KERNEL=="sd*", ATTRS{idVendor}=="a69c", ATTRS{idProduct}=="5723",  SYMLINK+="tendaudisk", ENV{UDISKS_IGNORE}="1", RUN+="/usr/bin/eject /dev/%k"
+KERNEL=="sd*", ATTRS{idVendor}=="a69c", ATTRS{idProduct}=="572c",  SYMLINK+="aicudisk", ENV{UDISKS_IGNORE}="1", RUN+="/usr/bin/eject /dev/%k"
+
+# Rename WiFi interface
+SUBSYSTEM=="net", ACTION=="add", ATTRS{idVendor}=="368b", ATTRS{idProduct}=="8d81", NAME="wlan_cudy"
