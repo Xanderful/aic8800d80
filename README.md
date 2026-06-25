@@ -1,4 +1,4 @@
-# AIC8800D80 USB WiFi Driver for Linux (Kernel 6.15+)
+# AIC8800D80 USB WiFi Driver for Linux (Kernel 6.15 – 7.0+)
 
 A patched Linux driver for the **AIC8800D80** chipset, tested with the **CUDY WU900** USB WiFi adapter. Forked from [goecho/aic8800_linux_drvier](https://github.com/goecho/aic8800_linux_drvier) with fixes for modern kernels (6.15 – 6.17+).
 
@@ -20,7 +20,7 @@ Other AIC8800D80-based adapters (USB IDs `a69c:5721`, `a69c:5723`) should also w
 
 ## Requirements
 
-- Linux kernel **6.15+** (tested on 6.17.0)
+- Linux kernel **6.15+** (tested on 6.17.0 and 7.0.0)
 - Kernel headers and build tools
 
 ```bash
@@ -112,6 +112,21 @@ These patches fix build failures on kernel 6.15 – 6.17+:
 | `rwnx_radar.c` | Added `link_id` param to `cfg80211_cac_event()` |
 | `aicwf_usb.h` / `aicwf_usb.c` | Added USB product IDs `0x8d80`, `0x8d81` and vendor `0x368b` for CUDY WU900 |
 | `tools/aic.rules` | Added udev rule for USB ID `572c`, `UDISKS_IGNORE` to suppress mount popups, WiFi interface rename |
+
+### Kernel 7.0 support
+
+Additional patches fixing build failures on kernel 7.0 (guarded with `LINUX_VERSION_CODE >= KERNEL_VERSION(6, 18, 0)`, so 6.15–6.17 keep building):
+
+| File | Fix |
+|------|-----|
+| `rwnx_rx.c` | `in_irq()` removed from the kernel → `in_hardirq()` |
+| `rwnx_main.c` | `cfg80211_ops.set_monitor_channel` gained a `struct net_device *` parameter |
+| `rwnx_main.c` | `cfg80211_ops.set_wiphy_params` gained an `int radio_idx` parameter |
+| `rwnx_main.c` | `cfg80211_ops.set_tx_power` gained an `int radio_idx` parameter |
+| `rwnx_main.c` | `cfg80211_ops.start_radar_detection` gained a trailing `int link_id` parameter |
+| `rwnx_main.c` | Updated the internal `set_monitor_channel()` call site to match the new signature |
+
+The new `radio_idx` / `link_id` arguments are accepted and ignored — correct behavior for this single-radio, non-MLO device. Tested on Ubuntu kernel `7.0.0-22-generic` with an AIC8800D80 adapter (`a69c:5721`).
 
 ## License
 
